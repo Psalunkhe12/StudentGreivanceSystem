@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Grievance - Teacher Panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100">
+    <nav class="bg-white shadow p-4 flex justify-between items-center">
+        <h1 class="text-xl font-bold">Admin Panel</h1>
+        <a href="index.html" class="bg-gray-500 text-white px-4 py-2 rounded">Home</a>
+    </nav>
+
+    <!-- Admin Dashboard -->
+    <section class="p-4">
+        <div class="max-w-6xl mx-auto mt-6">
+            <h2 class="text-lg font-semibold mb-4">Admin Dashboard</h2>
+            <div id="adminGrievanceList" class="space-y-4"></div>
+        </div>
+    </section>
+
+    <script>
+        let grievances = JSON.parse(localStorage.getItem('grievances')) || [];
+
+        function renderAdminGrievances() {
+            const list = document.getElementById('adminGrievanceList');
+            list.innerHTML = '';
+            grievances.forEach(g => {
+                const item = document.createElement('div');
+                item.className = 'bg-white shadow p-4 rounded';
+                item.innerHTML = `
+                    <p><strong>Name:</strong> ${g.name}</p>
+                    <p><strong>Roll No:</strong> ${g.rollNo}</p>
+                    <p><strong>Category:</strong> ${g.category}</p>
+                    <p><strong>Description:</strong> ${g.description}</p>
+                    <p><strong>Status:</strong> <span class="${getStatusColor(g.status)}">${g.status}</span></p>
+                    <textarea id="response-${g.id}" class="w-full border mt-2 px-2 py-1 rounded"
+                        placeholder="Admin Response">${g.response}</textarea>
+                    <select id="status-${g.id}" class="w-full border mt-2 px-2 py-1 rounded">
+                        <option ${g.status === 'Pending' ? 'selected' : ''}>Pending</option>
+                        <option ${g.status === 'In Process' ? 'selected' : ''}>In Process</option>
+                        <option ${g.status === 'Resolved' ? 'selected' : ''}>Resolved</option>
+                    </select>
+                    <button onclick="updateGrievance(${g.id})"
+                        class="bg-green-500 text-white px-4 py-2 mt-2 rounded">Update</button>
+                `;
+                list.appendChild(item);
+            });
+        }
+
+        function updateGrievance(id) {
+            const response = document.getElementById(`response-${id}`).value;
+            const status = document.getElementById(`status-${id}`).value;
+
+            grievances = grievances.map(g => {
+                if (g.id === id) {
+                    return { ...g, response, status };
+                }
+                return g;
+            });
+
+            localStorage.setItem('grievances', JSON.stringify(grievances));
+            alert('Grievance updated!');
+            renderAdminGrievances();
+        }
+
+        function getStatusColor(status) {
+            switch (status) {
+                case 'Pending': return 'text-yellow-500';
+                case 'In Process': return 'text-blue-500';
+                case 'Resolved': return 'text-green-500';
+                default: return '';
+            }
+        }
+
+        renderAdminGrievances();
+    </script>
+</body>
+
+</html>

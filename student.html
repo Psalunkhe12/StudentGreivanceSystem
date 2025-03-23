@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Grievance - Student Panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100">
+    <nav class="bg-white shadow p-4 flex justify-between items-center">
+        <h1 class="text-xl font-bold">Student Panel</h1>
+        <a href="index.html" class="bg-gray-500 text-white px-4 py-2 rounded">Home</a>
+    </nav>
+
+    <!-- Submit Grievance Form -->
+    <section class="p-4">
+        <div class="max-w-xl mx-auto bg-white shadow p-6 rounded mt-6">
+            <h2 class="text-lg font-semibold mb-4">Submit Grievance</h2>
+            <form id="grievanceForm" class="space-y-4">
+                <input type="text" id="studentName" placeholder="Name" class="w-full border px-3 py-2 rounded" required>
+                <input type="text" id="rollNo" placeholder="Roll No" class="w-full border px-3 py-2 rounded" required>
+                <select id="category" class="w-full border px-3 py-2 rounded" required>
+                    <option value="">Select Category</option>
+                    <option>Academic</option>
+                    <option>Hostel</option>
+                    <option>Transport</option>
+                    <option>Other</option>
+                </select>
+                <textarea id="description" placeholder="Describe your grievance"
+                    class="w-full border px-3 py-2 rounded" required></textarea>
+                <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Submit</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Student Dashboard -->
+    <section class="p-4">
+        <div class="max-w-4xl mx-auto mt-6">
+            <h2 class="text-lg font-semibold mb-4">My Grievances</h2>
+            <div id="studentGrievanceList" class="space-y-4"></div>
+        </div>
+    </section>
+
+    <script>
+        let grievances = JSON.parse(localStorage.getItem('grievances')) || [];
+
+        document.getElementById('grievanceForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const grievance = {
+                id: Date.now(),
+                name: document.getElementById('studentName').value,
+                rollNo: document.getElementById('rollNo').value,
+                category: document.getElementById('category').value,
+                description: document.getElementById('description').value,
+                status: 'Pending',
+                response: ''
+            };
+
+            grievances.push(grievance);
+            localStorage.setItem('grievances', JSON.stringify(grievances));
+
+            alert('Grievance submitted!');
+            this.reset();
+            renderStudentGrievances();
+        });
+
+        function renderStudentGrievances() {
+            const list = document.getElementById('studentGrievanceList');
+            list.innerHTML = '';
+            grievances.forEach(g => {
+                const item = document.createElement('div');
+                item.className = 'bg-white shadow p-4 rounded';
+                item.innerHTML = `
+                    <p><strong>Category:</strong> ${g.category}</p>
+                    <p><strong>Description:</strong> ${g.description}</p>
+                    <p><strong>Status:</strong> <span class="${getStatusColor(g.status)}">${g.status}</span></p>
+                    <p><strong>Response:</strong> ${g.response || 'No response yet'}</p>
+                `;
+                list.appendChild(item);
+            });
+        }
+
+        function getStatusColor(status) {
+            switch (status) {
+                case 'Pending': return 'text-yellow-500';
+                case 'In Process': return 'text-blue-500';
+                case 'Resolved': return 'text-green-500';
+                default: return '';
+            }
+        }
+
+        renderStudentGrievances();
+    </script>
+</body>
+
+</html>
+
+
